@@ -38,3 +38,4 @@ class Utils(BaseUrl):
         url=f"{self.base_url}/lol/platform/v4/third-party-code/by-summoner/{Id}?api_key={self.token}"
         return self.data_rq(url)
 
+

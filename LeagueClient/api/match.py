@@ -4,6 +4,66 @@ from .request_errors import RequestErrors
 from .rate_limit import RateLimit
 from .utils_data import champs,seasons,queue_types
 
+class MatchInfo(object):
+    def __init__(self,data):
+        self.data=data
+
+    def __repr__(self):
+        return str(self.data.status_code)
+
+    @property
+    def match_ids(self):
+        data_json=self.data.json()
+        new_ids=[]
+        for match in data_json['matches']:
+            new_ids.append(match['gameId'])
+
+        return new_ids
+
+    @property
+    def champions(self):
+        data_json=self.data.json()
+        champion_sets={}
+        for match in data_json['matches']:
+            champion_sets[champs['reversed_order'][match['champion']]]=match['champion']
+        _reversed={v: k for k, v in champion_sets.items()}
+
+        return champion_sets,_reversed
+
+    @property
+    def champion_ids(self):
+        data_json=self.data.json()
+        champ_ids=[]
+        for match in data_json['matches']:
+            champ_ids.append(match['champion'])
+
+        return champ_ids
+
+    @property
+    def champion_names(self):
+        data_json=self.data.json()
+        champ_names=[]
+        for match in data_json['matches']:
+            champ_names.append(champs['reversed_order'][match['champion']])
+        
+        return champ_names
+
+    
+    @property
+    def queue_types(self):
+        data_json=self.data.json()
+        queues=[]
+        for match in data_json['matches']:
+            queues.append(match['queue'])
+        
+        return queues
+
+    def json(self):
+        return self.data.json()
+    
+    def raw_data(self):
+        return self.data
+
 
 
 class Match(BaseUrl):
@@ -109,7 +169,7 @@ class Match(BaseUrl):
 
         return new_link
 
-    def _match_opts(self,accId,**opts):
+    def get_matchs(self,accId,**opts):
         options=['champion','queue','season','endTime','beginTime','endIndex','beginIndex']
         url=f"{self.base_url}/lol/match/v4/matchlists/by-account/{accId}?api_key={self.token}"
         for op in opts.copy():
