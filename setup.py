@@ -9,7 +9,7 @@ with open('requirements.txt') as f:
 setup(name='LeagueClient',
       author='Cheng Yue',
       url='https://github.com/Rapptz/discord.py',
-      version=version,
+      version="0.1",
       packages=['client'],
       license='MIT',
       description='A Python wrapper for the League of Legends API',
