@@ -4,9 +4,11 @@ from .request_errors import RequestErrors
 from .rate_limit import RateLimit
 from .utils_data import champs,seasons,queue_types
 
+__all__=["Match"]
 class MatchInfo(object):
     def __init__(self,data):
         self.data=data
+        self.json_data=data.json()
 
     def __repr__(self):
         return str(self.data.status_code)
@@ -22,9 +24,8 @@ class MatchInfo(object):
 
     @property
     def champions(self):
-        data_json=self.data.json()
         champion_sets={}
-        for match in data_json['matches']:
+        for match in self.json_data['matches']:
             champion_sets[champs['reversed_order'][match['champion']]]=match['champion']
         _reversed={v: k for k, v in champion_sets.items()}
 
@@ -32,18 +33,16 @@ class MatchInfo(object):
 
     @property
     def champion_ids(self):
-        data_json=self.data.json()
         champ_ids=[]
-        for match in data_json['matches']:
+        for match in self.json_data['matches']:
             champ_ids.append(match['champion'])
 
         return champ_ids
 
     @property
     def champion_names(self):
-        data_json=self.data.json()
         champ_names=[]
-        for match in data_json['matches']:
+        for match in self.json_data['matches']:
             champ_names.append(champs['reversed_order'][match['champion']])
         
         return champ_names
@@ -51,18 +50,24 @@ class MatchInfo(object):
     
     @property
     def queue_types(self):
-        data_json=self.data.json()
         queues=[]
-        for match in data_json['matches']:
+        for match in self.json_data['matches']:
             queues.append(match['queue'])
         
         return queues
 
+    @property
     def json(self):
-        return self.data.json()
+        return self.json_data
     
+    @property
     def raw_data(self):
         return self.data
+
+    @property
+    def status_code(self):
+        return self.data.status_code
+    
 
 
 
@@ -169,7 +174,7 @@ class Match(BaseUrl):
 
         return new_link
 
-    def get_matchs(self,accId,**opts):
+    def get_matches(self,accId,**opts):
         options=['champion','queue','season','endTime','beginTime','endIndex','beginIndex']
         url=f"{self.base_url}/lol/match/v4/matchlists/by-account/{accId}?api_key={self.token}"
         for op in opts.copy():
@@ -177,5 +182,6 @@ class Match(BaseUrl):
                 opts.pop(op)
                 print(f'Keyword "{op}" not found. Removed')
 
-        new_url=check_all_opts(opts)
-        return self.data_rq(url+new_url)
+        new_url=self.check_all_opts(opts)
+        data=self.data_rq(url+new_url)
+        return MatchInfo(data)

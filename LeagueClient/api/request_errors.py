@@ -18,3 +18,7 @@ class RequestErrors(object):
     @property
     def url(self):
         return self.data.url
+
+    @property
+    def status_code(self):
+        return self.data.status_code
