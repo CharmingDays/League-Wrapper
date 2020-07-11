@@ -4,6 +4,10 @@ import asyncio,base64
 import lcu_connector_python as lcu
 import os,json
 
+
+
+
+
 class BaseLCU(object):
     def __init__(self):
         self._local=lcu.connect()
@@ -13,6 +17,14 @@ class BaseLCU(object):
         self.session=rq.Session()
         self.session.verify=os.path.join(os.path.dirname(os.path.abspath(__file__)),'riotgames.pem')
         self.session.headers=self.headers
+        # self.check_perm_file()
+
+
+
+    def check_perm_file(self):
+        perm_path=os.path.dirname(os.path.abspath(__file__)),'riotgames.pem'
+        return perm_path
+
 
     
     def check_200(self,path,method:str,_bool:bool=False,payload=None):
@@ -30,6 +42,7 @@ class BaseLCU(object):
 class Lobby(BaseLCU):
     def __init__(self):
         super().__init__()
+
 
     def create_lobby(self,queue_type:int=400):
         path=self.url+"/lol-lobby/v2/lobby"
@@ -50,21 +63,19 @@ class Lobby(BaseLCU):
         return position_data
 
     def send_invite(self,summoner_name:str):
-        summoner_url=self.url+f"/lol-summoner/v1/summoners?name={summoner_name}"
-        summoner_data=self.session.get(summoner_url)
+        summoner_path=self.url+f"/lol-summoner/v1/summoners?name={summoner_name}"
+        summoner_data=self.check_200(summoner_path)
         
         if summoner_data.status_code == 404:
             return f"Summoner {summoner_name} not found"
         
         summoner_id=summoner_data.json()['summonerId']
-        invite_url=self.url+'/lol-lobby/v2/lobby/invitations'
+        invite_path=self.url+'/lol-lobby/v2/lobby/invitations'
         payload=[{
             "toSummonerId":summoner_id
         }]
 
-        invite_data=self.session.post(invite_url,data=json.dumps(payload))
-
-        return invite_data
+        return self.check_200(invite_path,'POST',_bool=False,payload=json.dumps(payload))
 
     def leave_lobby(self):
         path=self.url+'/lol-lobby/v2/lobby'
@@ -88,7 +99,6 @@ class Lobby(BaseLCU):
             return self.find_custom_games()
 
 
-
     
     def start_queue(self):
         path=self.url+'/lol-lobby/v2/lobby/matchmaking/search'
@@ -103,8 +113,6 @@ class Lobby(BaseLCU):
 
 
 
-
-
 class MatchMaking(BaseLCU):
     def __init__(self):
         super().__init__()
@@ -115,13 +123,7 @@ class MatchMaking(BaseLCU):
         Check to see if lobby is in queue and ready to accept match
         """
         path=self.url+'/lol-matchmaking/v1/ready-check'
-        ready_data=self.session.get(path)
-        if ready_data.status_code in [200,204]:
-            return ready_data
-
-        return RuntimeError
-
-
+        return self.check_200(path,'GET')
 
     def decline_match(self):
         """
