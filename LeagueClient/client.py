@@ -10,8 +10,8 @@ from .api.summoner import Summoner as _Summoner
 from .api.utils import Utils as _Utils
 
 class Client(BaseUrl):
-    def __init__(self,region,token,_rate_limit=None):
-        super().__init__(region,token,_rate_limit)
+    def __init__(self,region,token):
+        super().__init__(region,token)
 
     @property
     def Summoner(self):

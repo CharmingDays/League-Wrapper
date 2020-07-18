@@ -4,13 +4,12 @@ import requests
 
 
 class BaseUrl(object):
-    def __init__(self,region,token,_rate_limit=None):
+    def __init__(self,region,token):
         self.region=region
         self.token=token
         self.base_url=f'https://{region}.api.riotgames.com'
         self.rq=requests
         self.rq_url=None
-        self.rate_limit=_rate_limit
 
 
     def change_token(self,new_token):

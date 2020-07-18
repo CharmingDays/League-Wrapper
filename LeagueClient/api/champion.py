@@ -6,10 +6,8 @@ from .rate_limit import RateLimit
 __all__=["ChampionMastery"]
 
 class ChampionMastery(BaseUrl):
-    def __init__(self,region,token,_rate_limit=None):
-        super().__init__(region,token,_rate_limit)
-        if _rate_limit is not None and _rate_limit > 25:
-            raise LimitTriesExceeded
+    def __init__(self,region,token):
+        super().__init__(region,token)
 
 
     def data_rq(self,url):

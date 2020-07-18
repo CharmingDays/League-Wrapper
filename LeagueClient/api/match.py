@@ -72,10 +72,8 @@ class MatchInfo(object):
 
 
 class Match(BaseUrl):
-    def __init__(self,region,token,_rate_limit=None):
-        super().__init__(region,token,_rate_limit)
-        if _rate_limit is not None and _rate_limit > 25:
-            raise LimitTriesExceeded
+    def __init__(self,region,token):
+        super().__init__(region,token)
 
 
     def data_rq(self,url):
@@ -155,17 +153,17 @@ class Match(BaseUrl):
     def check_all_opts(self,opts):
         new_link=""
         if 'champion' in opts:
-            champion=_champion_check(opts['champion'])
+            champion=self._champion_check(opts['champion'])
             new_link+=champion
             opts.pop('champion')
 
         if 'queue' in opts:
-            queue=_queue_check(opts['queue'])
+            queue=self._queue_check(opts['queue'])
             new_link+=queue
             opts.pop('queue')
 
         if 'season' in opts:
-            season=_season_check(opts['season'])
+            season=self._season_check(opts['season'])
             new_link+=season
             opts.pop('season')
             
